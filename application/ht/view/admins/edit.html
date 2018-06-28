@@ -1,0 +1,89 @@
+{include file='common/header'}
+<script type="text/javascript" src="/static/ht/js/jquery/jquery.form.js"></script>
+
+<style type="text/css">
+.parentFileBox>.fileBoxUl>li>.viewThumb{
+	width:150px;height:200px;
+}
+.parentFileBox>.fileBoxUl>li{
+	width:150px;height:200px;
+}
+</style>
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">{if $admins[uid]}编辑管理员{else}创建管理员{/if}&nbsp;&nbsp;<a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/admins?v={:time()}">返回列表</a> </div>
+      <div class="layui-card-body" style="padding: 15px;">
+        <form class="layui-form" action="/ht/admins/do_edit" lay-filter="component-form-group" id="form" method="post">
+
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">账号</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="username" lay-verify="required" autocomplete="off" placeholder="请输入账号" class="layui-input" value="{$admins[username]}">
+            </div>
+          </div>
+          
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">密码</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="password" lay-verify="required" autocomplete="off" placeholder="请输入密码" class="layui-input" value="">
+            </div>
+          </div>
+          
+          
+          <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+            	<div class="layui-footer" style="left:0px">
+            		<input type="hidden" name="uid" value="{$admins[uid]}"/>
+	                <button class="layui-btn" lay-submit="" lay-filter="form-submit">立即提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script>
+  layui.use(['form'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+    
+    form.render(null, 'component-form-group');
+    
+
+    /* 监听提交 */
+    form.on('submit(form-submit)', function(data){
+    	 $('form').ajaxSubmit({ 
+            type: 'post',
+            url: '{:url("admins/do_edit")}',
+            data: data.field, 
+            dataType:'json',
+            success: function(res) {
+				if(res.code==100){
+	    			layer.msg('操作成功', {
+			            offset: '15px'
+			            ,icon: 1
+			            ,time: 500
+			          }, function(){
+			            location.href = '/ht/admins'; 
+			          });
+	    		}else{
+	    			dialog.error(res.msg);
+	    		}
+            }
+        }); 
+        return false;
+    });
+	
+  });
+</script>
+  
+{include file='common/footer'}

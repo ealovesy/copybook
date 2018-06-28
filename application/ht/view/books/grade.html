@@ -1,0 +1,101 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">
+          	<button class="layui-btn layui-btn-sm edit_grade" >添加年级</button>
+          </div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list" lay-filter="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" id="handle">
+	<div class="layui-table-cell laytable-cell-1-10"> 
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> 
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a> 
+	</div>
+</script>
+<script>
+layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  	
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/books/getGrade'
+      ,method: 'POST'
+      ,limit: 15
+      ,count: {$total}
+      ,cols: [[
+        {field:'id', title: '编号',width:80}
+        ,{field:'name', title: '年级名称'}
+        ,{field:'handle', title: '操作', templet:'#handle'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+		
+      }
+    });
+    
+    //监听工具条
+	  table.on('tool(table-list)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'detail'){
+	      layer.msg('ID：'+ data.id + ' 的查看操作');
+	    } else if(obj.event === 'del'){
+	      layer.confirm('确定删除该年级吗？', function(index){
+	      	$.post('{:url("books/del_grade")}',{'grade_id':data.id},function(res){
+	      		if(res.code==100){
+	      			obj.del();
+	     	   		layer.close(index);
+	      		}else{
+	      			dialog.error('删除失败');
+	      		}
+				
+			},'json');
+	      });
+	    } else if(obj.event === 'edit'){
+	    	$.post('{:url("books/edit_grade")}',{'grade_id':data.id},function(html){
+				layer.open({
+					type: 1,
+					title: "添加年级/编辑年级",
+					shadeClose: !0,
+					shade: .5,
+					area: ["60%", "40%"],
+					content: html,
+					success:function(layero, index){
+						
+					}
+				})
+			},'text');
+	    }
+	  });
+    
+  });
+  
+  $(".edit_grade").click(function(){
+  	var grade_id = $(this).data('grade_id')>0 ? $(this).data('grade_id') : 0;
+	$.post('{:url("books/edit_grade")}',{'grade_id':grade_id},function(html){
+		layer.open({
+			type: 1,
+			title: "添加年级/编辑年级",
+			shadeClose: !0,
+			shade: .5,
+			area: ["60%", "40%"],
+			content: html,
+			success:function(layero, index){
+				
+			}
+		})
+	},'text');
+  });
+  
+  
+
+</script>
+{include file='common/footer'}

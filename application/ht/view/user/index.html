@@ -1,0 +1,46 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">用户列表</div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script type="text/html" id="titleTpl">
+  <img src="{{d.avatar}}" alt="" width="30"/>
+</script>
+<script>
+	layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/user/getPage'
+      ,method: 'POST'
+      ,limit: 15
+      ,count: {$total}
+      ,cols: [[
+        {field:'uid', title: '编号',width:80,templet: '#titleTp2'}
+        ,{field:'avatar', title: '头像',width:180,templet: '#titleTpl'}
+        ,{field:'nickname',title:'用户账号', title: 'icon',templet: '#titleTp3',align:'center'}
+        ,{field:'mobile', title: '手机'}
+        ,{field:'created_at',title: '加入时间',align:'center'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+		
+      }
+    });
+    
+  });
+
+</script>
+{include file='common/footer'}

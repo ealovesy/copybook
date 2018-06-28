@@ -1,0 +1,70 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">
+          	<a href="/ht/admins/edit"><button class="layui-btn layui-btn-sm">添加管理员</button></a>
+          </div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list" lay-filter="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" id="handle">
+	<div class="layui-table-cell laytable-cell-1-10"> 
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> 
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a> 
+	</div>
+</script>
+
+<script>
+layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  	
+  	//渲染表格
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/admins/getPage'
+      ,method: 'POST'
+      ,limit: 15
+      ,count: {$total}
+      ,cols: [[
+        {field:'uid', title: '编号',width:80}
+        ,{field:'username', title: '用户名',}
+        ,{field:'handle', title: '操作', templet:'#handle'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+		
+      }
+    });
+    
+    //监听工具条
+	  table.on('tool(table-list)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	      layer.confirm('确定删除该管理员吗？', function(index){
+	      	$.post('{:url("admins/del_admin")}',{'uid':data.uid},function(res){
+	      		if(res.code==100){
+	      			obj.del();
+	     	   		layer.close(index);
+	      		}else{
+	      			dialog.error('删除失败');
+	      		}
+				
+			},'json');
+	      });
+	    } else if(obj.event === 'edit'){
+	    	location.href='/ht/admins/edit?uid='+data.uid;
+	    }
+	  });
+    
+  });
+
+</script>
+{include file='common/footer'}

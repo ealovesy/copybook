@@ -1,0 +1,115 @@
+<nav id="mainnav-container">
+	<div id="mainnav">
+		<!--Menu-->
+		<div id="mainnav-menu-wrap">
+			<div class="nano">
+				<div class="nano-content">
+					<div id="mainnav-profile" class="mainnav-profile">
+						<div class="profile-wrap">
+							<div class="pad-btm">
+								<img class="img-circle img-sm img-border" src="/static/ht/images/avatar.png" alt="头像">
+							</div>
+							<a href="#profile-nav" class="box-block" data-toggle="collapse" aria-expanded="false">
+							<span class="pull-right dropdown-toggle">
+							</span>
+							<p class="mnp-name">
+								{$admin['username']}
+							</p>
+							</a>
+						</div>
+					</div>
+					<ul id="mainnav-menu" class="list-group">
+						<!--Category name-->
+						<li class="list-header">菜单导航</li>
+						<!--Menu list item-->
+							<li class="active-link">
+				                <a href="/ht/user/index" data-original-title="" title="">
+				                    <i class="ion-person"></i>
+				                    <span class="menu-title">
+										<strong>用户列表</strong>
+									</span>
+				                </a>
+				            </li>
+							<li class="active-link active">
+								<a href="#">
+									<i class="ion-briefcase"></i>
+									<span class="menu-title">
+									<strong>定制管理</strong>
+									</span>
+								<i class="arrow"></i>
+								</a>
+								<ul class="collapse">
+									<li class=""><a href="/ht/product/index">款式列表</a></li>
+									<li class=""><a href="/ht/product/type">产品列表</a></li>
+									<li class=""><a href="/ht/product/price">产品库价格</a></li>
+								</ul>
+							</li>
+							<li class="active-link active">
+								<a href="#">
+									<i class="ion-briefcase"></i>
+									<span class="menu-title">
+									<strong>订单管理</strong>
+									</span>
+								<i class="arrow"></i>
+								</a>
+								<ul class="collapse">
+									<li class=""><a href="/ht/order/index">订单列表</a></li>
+								</ul>
+							</li>
+							<li class="active-link active">
+								<a href="#">
+									<i class="ion-briefcase"></i>
+									<span class="menu-title">
+									<strong>留言管理</strong>
+									</span>
+								<i class="arrow"></i>
+								</a>
+								<ul class="collapse">
+									<li class=""><a href="/ht/contact/index">留言列表</a></li>
+								</ul>
+							</li>
+							<li class="active-link active">
+								<a href="#">
+									<i class="ion-briefcase"></i>
+									<span class="menu-title">
+									<strong>系统设置</strong>
+									</span>
+								<i class="arrow"></i>
+								</a>
+								<ul class="collapse">
+									<li class=""><a href="/ht/setting/index">网站信息</a></li>
+								</ul>
+							</li>
+							<li class="active-link active">
+								<a href="#">
+									<i class="ion-briefcase"></i>
+									<span class="menu-title">
+									<strong>模块管理</strong>
+									</span>
+								<i class="arrow"></i>
+								</a>
+								<ul class="collapse">
+									<li class=""><a href="/ht/module/index">模块设置</a></li>
+									{if $module_type_u}
+										{foreach $module_type_u as $mdl}
+											<li class=""><a href="/ht/module/child?id={$mdl['id']}">{$mdl[title]}</a></li>
+										{/foreach}
+									{/if}
+								</ul>
+							</li>
+				            <li class="layui-nav-item">
+				                <a href="/ht/admins" data-original-title="" title="">
+				                    <i class="ion-person-add"></i>
+				                    <span class="menu-title">
+										<strong>管理员列表</strong>
+									</span>
+				                </a>
+				            </li>
+					
+					</ul>
+				</div>
+			</div>
+		</div>
+		<!--End menu-->
+	</div>
+</nav>

@@ -1,0 +1,112 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">
+          <a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books?v={:time()}">返回图书列表</a> 	&nbsp;&nbsp;<button class="layui-btn layui-btn-sm edit_unit">添加单元</button>	
+          &nbsp;&nbsp;<a class="layui-btn  layui-btn-sm" href="/ht/books/book_import?book_id={$book_id}&v={:time()}">批量导入内容</a>
+          &nbsp;&nbsp;<a class="layui-btn  layui-btn-sm" href="/ht/books/exam_import?book_id={$book_id}&v={:time()}">批量导入题库</a>
+          </div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list" lay-filter="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" id="title">
+	<a href="/ht/books/unit_page?book_id={$book_id}&unit_id={{ d.id }}">{{ d.unit_num }}</a>
+</script>
+<script type="text/javascript" id="handle">
+	<div class="layui-table-cell laytable-cell-1-10"> 
+		<a class="layui-btn layui-btn-xs" lay-event="exam">题库</a> 
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> 
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a> 
+	</div>
+</script>
+
+<script>
+layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  	
+  	//渲染表格
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/books/getUnit'
+      ,method: 'POST'
+      ,where: {
+      	count: {$total}
+      	,limit: 15
+      	,book_id: {$book_id}
+      }
+      ,cols: [[
+        {field:'id', title: '编号',width:80}
+        ,{field:'unit_num', title: '单元',width:500, templet:'#title'}
+        ,{field:'title',title: '单元标题',templet: '#status',align:'center'}
+        ,{field:'handle', title: '操作', templet:'#handle'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+		
+      }
+    });
+    
+    //监听工具条
+	  table.on('tool(table-list)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	      layer.confirm('确定删除该单元吗？', function(index){
+	      	$.post('{:url("books/del_unit")}',{'unit_id':data.id},function(res){
+	      		if(res.code==100){
+	      			obj.del();
+	     	   		layer.close(index);
+	      		}else{
+	      			dialog.error('删除失败');
+	      		}
+				
+			},'json');
+	      });
+	    } else if(obj.event === 'edit'){
+	    	$.post('{:url("books/edit_unit")}',{'unit_id':data.id, 'book_id':{$book_id}},function(html){
+				layer.open({
+					type: 1,
+					title: "添加单元/编辑单元",
+					shadeClose: !0,
+					shade: .5,
+					area: ["60%", "40%"],
+					content: html,
+					success:function(layero, index){
+						
+					}
+				})
+			},'text');
+	    } else if(obj.event === 'exam'){
+	    	location.href='/ht/books/unit_exam?unit_id='+data.id+'&book_id={$book_id}';
+	    }
+	  });
+    	
+    $(".edit_unit").click(function(){
+	  	var unit_id = $(this).data('unit_id')>0 ? $(this).data('unit_id') : 0;
+		$.post('{:url("books/edit_unit")}',{'unit_id':unit_id, 'book_id':{$book_id}},function(html){
+			layer.open({
+				type: 1,
+				title: "添加单元/编辑单元",
+				shadeClose: !0,
+				shade: .5,
+				area: ["60%", "40%"],
+				content: html,
+				success:function(layero, index){
+					
+				}
+			})
+		},'text');
+	  });
+	  
+	  
+  });
+
+</script>
+{include file='common/footer'}

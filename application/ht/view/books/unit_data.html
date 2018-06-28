@@ -1,0 +1,79 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">
+          <a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books/unit_page?book_id={$book_id}&page_id={$page_id}&unit_id={$unit_id}&v={:time()}">返回页码列表</a> 	&nbsp;&nbsp;<a href="/ht/books/edit_unit_data?book_id={$book_id}&page_id={$page_id}&unit_id={$unit_id}&v={:time()}"><button class="layui-btn layui-btn-sm ">添加内容</button></a>
+          </div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list" lay-filter="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" id="title">
+	<a href="/ht/books/unit_data?page_id={{ d.id }}">{{ d.title }}</a>
+</script>
+<script type="text/javascript" id="handle">
+	<div class="layui-table-cell laytable-cell-1-10"> 
+		<a class="layui-btn layui-btn-xs" lay-event="edit">编辑</a> 
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a> 
+	</div>
+</script>
+
+<script>
+layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  	
+  	//渲染表格
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/books/getUnitData'
+      ,method: 'POST'
+      ,where: {
+      	count: {$total}
+      	,limit: 15
+      	,page_id: {$page_id}
+      }
+      ,cols: [[
+        {field:'id', title: '编号',width:80}
+        ,{field:'title',title: '类型',align:'center'}
+        ,{field:'yinbiao',title: '音标',align:'center'}
+        ,{field:'shiyi',title: '释义',align:'center'}
+        ,{field:'handle', title: '操作', templet:'#handle'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+		
+      }
+    });
+    
+    //监听工具条
+	  table.on('tool(table-list)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	      layer.confirm('确定删除该页码吗？', function(index){
+	      	$.post('{:url("books/del_unit_page")}',{'unit_page_id':data.id},function(res){
+	      		if(res.code==100){
+	      			obj.del();
+	     	   		layer.close(index);
+	      		}else{
+	      			dialog.error('删除失败');
+	      		}
+				
+			},'json');
+	      });
+	    } else if(obj.event === 'edit'){
+	    	location.href='/ht/books/edit_unit_data?book_id={$book_id}&page_id={$page_id}&unit_id={$unit_id}&datas_id='+data.id+'&v={:time()}';
+	    }
+	  });
+    	
+	  
+  });
+
+</script>
+{include file='common/footer'}

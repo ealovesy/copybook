@@ -1,0 +1,167 @@
+{include file='common/header'}
+<script type="text/javascript" src="/static/ht/js/jquery/jquery.form.js"></script>
+<!--上传组件-->
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/webuploader.css?v1" />
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/bootstrap.min.css" />
+<script type="text/javascript" src="/static/ht/plugins/webUploader/js/webuploader.js?v=1"></script>
+
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">批量导入内容&nbsp;&nbsp;<a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books/unit?book_id={$book_id}&v={:time()}">返回单元列表</a> </div>
+      <div class="layui-card-body" style="padding: 15px;">
+      	<blockquote class="layui-elem-quote layui-text">
+      		<b>请先导入Excel，再导入音频，系统会自动关联词汇的音频</b><br/>
+		  下载词汇Excel文件参考导入格式：<a href="/ht/pk_exam/download?file_name=学熙字帖-词汇导入.xls&file_url=pkg/system_file/学熙字帖-词汇导入.xls" target="_blank">学熙字帖-词汇导入.xls</a><br/>
+		  词汇音频导入格式：<span style="color:#01AAED">Module 1-第一页-1-apple.mp3</span>  &nbsp;&nbsp;<span style="color:#FF5722">解析：</span>单元名称-页码名称-类型(1：单词，2：短语，3：句型)-词汇名称.后缀
+		</blockquote>
+        <form class="layui-form" action="" lay-filter="component-form-group" id="excel_form" method="post">
+			
+          <div class="layui-form-item">
+          	<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+			  <legend>导入词汇Excel：</legend>
+			</fieldset> 
+            <div class="">
+              <input type="file" name="units" lay-verify="required" autocomplete="off"  class="layui-btn layui-btn-sm ">
+            </div>
+          </div>
+          
+          <div class="layui-form-item layui-layout-admin">
+            <div class="">
+        		<input type="hidden" name="book_id" value="{$book_id}"/>
+                <button class="layui-btn" lay-submit="" lay-filter="excel-submit">立即上传</button>
+            </div>
+          </div>
+        </form>
+        
+        <form class="layui-form" action="" lay-filter="component-form-group" id="file_form" method="post">
+          <div class="layui-form-item">
+          	<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+			  <legend>导入词汇音频：</legend>
+			</fieldset> 
+			 
+			<div class="layui-upload">
+			  <button type="button" class="layui-btn layui-btn-normal" id="testList">选择多文件</button> 
+			  <div class="layui-upload-list">
+			    <table class="layui-table">
+			      <thead>
+			        <th>文件名</th>
+			        <th>大小</th>
+			        <th>状态</th>
+			        <th>操作</th>
+			      </thead>
+			      <tbody id="demoList"></tbody>
+			    </table>
+			  </div>
+			  <button type="button" class="layui-btn" id="testListAction">开始上传</button>
+			</div> 
+          </div>
+
+        </form>
+        
+      </div>
+    </div>
+  </div>
+
+
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script>
+  layui.use(['form','upload'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,upload = layui.upload
+    ,form = layui.form;
+    
+    form.render(null, 'component-form-group');
+	
+    /* 监听excel提交 */
+    form.on('submit(excel-submit)', function(data){
+    	 $('form').ajaxSubmit({ 
+            type: 'post',
+            url: '{:url("books/excel_import")}',
+            data: data.field, 
+            dataType:'json',
+            success: function(res) {
+				if(res.code==100){
+	    			layer.msg('操作成功', {
+			            offset: '15px'
+			            ,icon: 1
+			            ,time: 500
+			          }, function(){
+			            location.href = '/ht/books/unit?book_id={$book_id}&v={:time()}'; 
+			          });
+	    		}else{
+	    			dialog.error(res.msg);
+	    		}
+            }
+        }); 
+        return false;
+    });
+    
+    //多文件列表示例
+	  var demoListView = $('#demoList')
+	  ,uploadListIns = upload.render({
+	    elem: '#testList'
+	    ,url: '{:url("books/file_import")}?book_id={$book_id}'
+	    ,accept: 'file'
+	    ,multiple: true
+	    ,auto: false
+	    ,bindAction: '#testListAction'
+	    ,choose: function(obj){   
+	      var files = this.files = obj.pushFile(); //将每次选择的文件追加到文件队列
+	      //读取本地文件
+	      obj.preview(function(index, file, result){
+	        var tr = $(['<tr id="upload-'+ index +'">'
+	          ,'<td>'+ file.name +'</td>'
+	          ,'<td>'+ (file.size/1014).toFixed(1) +'kb</td>'
+	          ,'<td>等待上传</td>'
+	          ,'<td>'
+	            ,'<button class="layui-btn layui-btn-xs demo-reload layui-hide" type="button">重传</button>'
+	            ,'<button class="layui-btn layui-btn-xs layui-btn-danger demo-delete">删除</button>'
+	          ,'</td>'
+	        ,'</tr>'].join(''));
+	        
+	        //单个重传
+	        tr.find('.demo-reload').on('click', function(){
+	          obj.upload(index, file);
+	        });
+	        
+	        //删除
+	        tr.find('.demo-delete').on('click', function(){
+	          delete files[index]; //删除对应的文件
+	          tr.remove();
+	          uploadListIns.config.elem.next()[0].value = ''; //清空 input file 值，以免删除后出现同名文件不可选
+	        });
+	        
+	        demoListView.append(tr);
+	      });
+	    }
+	    ,done: function(res, index, upload){
+	      if(res.code == 100){ //上传成功
+	        var tr = demoListView.find('tr#upload-'+ index)
+	        ,tds = tr.children();
+	        tds.eq(2).html('<span style="color: #5FB878;">上传成功</span>');
+	        tds.eq(3).html(''); //清空操作
+	        return delete this.files[index]; //删除文件队列已经上传成功的文件
+	      }
+	      this.error(index, upload, res.msg);
+	    }
+	    ,error: function(index, upload, msg='上传失败'){
+	      var tr = demoListView.find('tr#upload-'+ index)
+	      ,tds = tr.children();
+	      tds.eq(2).html('<span style="color: #FF5722;">'+msg+'</span>');
+	      tds.eq(3).find('.demo-reload').removeClass('layui-hide'); //显示重传
+	    }
+	  });
+
+
+    
+    
+  });
+</script>
+
+
+{include file='common/footer'}

@@ -1,0 +1,81 @@
+{include file='common/header'}
+<script type="text/javascript" src="/static/ht/js/jquery/jquery.form.js"></script>
+<!--上传组件-->
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/webuploader.css?v1" />
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/bootstrap.min.css" />
+<script type="text/javascript" src="/static/ht/plugins/webUploader/js/webuploader.js?v=1"></script>
+
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">批量导入题库&nbsp;&nbsp;<a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books/unit?book_id={$book_id}&v={:time()}">返回单元列表</a> </div>
+      <div class="layui-card-body" style="padding: 15px;">
+        <form class="layui-form" action="" lay-filter="component-form-group" id="excel_form" method="post">
+			<blockquote class="layui-elem-quote layui-text">
+		  	下载Excel文件参考导入格式：<a href="/ht/pk_exam/download?file_name=学熙字帖-题库导入.xls&file_url=pkg/system_file/学熙字帖-题库导入.xls" target="_blank">学熙字帖-题库导入.xls</a>
+		</blockquote>
+          <div class="layui-form-item">
+          	<fieldset class="layui-elem-field layui-field-title" style="margin-top: 30px;">
+			  <legend>导入Excel：</legend>
+			</fieldset> 
+            <div class="">
+              <input type="file" name="exams" lay-verify="required" autocomplete="off"  class="layui-btn layui-btn-sm ">
+            </div>
+          </div>
+          
+          <div class="layui-form-item layui-layout-admin">
+            <div class="l">
+        		<input type="hidden" name="book_id" value="{$book_id}"/>
+                <button class="layui-btn" lay-submit="" lay-filter="excel-submit">立即上传</button>
+            </div>
+          </div>
+        </form>
+        
+        
+      </div>
+    </div>
+  </div>
+
+
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script>
+  layui.use(['form'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+    
+    form.render(null, 'component-form-group');
+	
+    /* 监听excel提交 */
+    form.on('submit(excel-submit)', function(data){
+    	 $('form').ajaxSubmit({ 
+            type: 'post',
+            url: '{:url("books/exam_import_submit")}',
+            data: data.field, 
+            dataType:'json',
+            success: function(res) {
+				if(res.code==100){
+	    			layer.msg('操作成功', {
+			            offset: '15px'
+			            ,icon: 1
+			            ,time: 500
+			          }, function(){
+			            location.href = '/ht/books/unit?book_id={$book_id}&v={:time()}'; 
+			          });
+	    		}else{
+	    			dialog.error(res.msg);
+	    		}
+            }
+        }); 
+        return false;
+    });
+    
+    
+  });
+</script>
+
+
+{include file='common/footer'}

@@ -1,0 +1,46 @@
+<div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-body" style="padding: 15px;">
+        <form class="layui-form" action="javascript:;" lay-filter="component-form-group" id="form">
+          <div class="layui-form-item">
+            <label class="layui-form-label">单元</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="unit_num" value="{$unit[unit_num]}"  autocomplete="off" placeholder="请输单元" class="layui-input" lay-verify="required">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label">单元标题</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="title" value="{$unit[title]}" autocomplete="off" placeholder="请输单元标题" class="layui-input" lay-verify="required">
+            </div>
+          </div>
+          <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+            	<input type="hidden" name="unit_id" value="{$unit[id]}"/>
+            	<input type="hidden" name="book_id" value="{$book_id}"/>
+                <button class="layui-btn" id="submit">立即提交</button>
+                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  
+<script type="text/javascript">
+	$("#submit").click(function(){
+		$.ajax({  
+            url:"{:url('books/submit_unit')}",
+            data:$("#form").serialize(),
+            type:"post",  
+            dataType:"json",  
+            success:function(data){  
+                if(data.code==100){
+                	location.reload();
+                }else{
+                	layer.msg(data.msg);
+                }
+            }
+        })
+	});
+</script>

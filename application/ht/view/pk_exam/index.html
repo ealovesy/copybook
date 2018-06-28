@@ -1,0 +1,99 @@
+{include file='common/header'}
+  <div class="layui-fluid">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-md12">
+        <div class="layui-card">
+          <div class="layui-card-header">
+           	&nbsp;&nbsp;<button class="layui-btn layui-btn-sm edit_pk_exam" >添加PK题库</button>
+           	&nbsp;&nbsp;<a class="layui-btn  layui-btn-sm" href="/ht/pk_exam/pk_exam_import?v={:time()}">批量导入题库</a>
+          </div>
+          <div class="layui-card-body">
+            <table class="layui-hide" id="table-list" lay-filter="table-list"></table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+<script type="text/javascript" id="difficult">
+	{{# if(d.difficult==1){ }}
+		简单
+	{{# }else if(d.difficult==2){ }}
+		中等
+	{{# }else if(d.difficult==3){ }}
+		困难
+	{{# } }}
+</script>
+<script type="text/javascript" id="type">
+	{{# if(d.type==1){ }}
+		汉译英
+	{{# }else if(d.type==2){ }}
+		单词释义
+	{{# }else if(d.type==3){ }}
+		听音选择
+	{{# } }}
+</script>
+<script type="text/javascript" id="handle">
+	<div class="layui-table-cell laytable-cell-1-10"> 
+		<a class="layui-btn layui-btn-xs" lay-event="edit" lay-id="{{ d.id }}">编辑</a>
+		<a class="layui-btn layui-btn-danger layui-btn-xs" lay-event="del">删除</a>
+	</div>
+</script>
+
+<script>
+layui.use(['table'], function(){
+    var admin = layui.admin
+    ,table = layui.table;
+  	
+  	//渲染表格
+    table.render({
+      elem: '#table-list'
+      ,url: '/ht/pk_exam/getPkExam'
+      ,method: 'POST'
+      ,where: {
+      	count: {$total}
+      }
+      ,limit: 15
+      ,limits: [15,30]
+      ,cols: [[
+        {field:'id', title: '编号',width:80}
+        ,{field:'type', title: '类型',width:150, templet:'#type'}
+        ,{field:'difficult', title: '难度',width:100, templet:'#difficult'}
+        ,{field:'name',title: '题目标题',align:'center'}
+        ,{field:'handle', title: '操作', templet:'#handle'}
+      ]]
+      ,page: true
+      ,done(res, curr, count){
+			
+      }
+    });
+    
+    //监听工具条
+	  table.on('tool(table-list)', function(obj){
+	    var data = obj.data;
+	    if(obj.event === 'del'){
+	      layer.confirm('确定删除该题目吗？', function(index){
+	      	$.post('{:url("pk_exam/del_pk_exam")}',{'pk_exam_id':data.id},function(res){
+	      		if(res.code==100){
+	      			obj.del();
+	     	   		layer.close(index);
+	      		}else{
+	      			dialog.error('删除失败');
+	      		}
+				
+			},'json');
+	      });
+	    } else if(obj.event === 'edit'){
+	    	location.href='/ht/pk_exam/edit_pk_exam?pk_exam_id='+obj.data.id;
+	    }
+	  });
+    	
+    $(".edit_pk_exam").click(function(){
+    	location.href='/ht/pk_exam/edit_pk_exam';
+	  });
+	  
+	  
+  });
+
+</script>
+{include file='common/footer'}

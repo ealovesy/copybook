@@ -1,0 +1,336 @@
+{include file='common/header'}
+<script type="text/javascript" src="/static/ht/js/jquery/jquery.form.js"></script>
+<!--上传组件-->
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/webuploader.css?v1" />
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/bootstrap.min.css" />
+<script type="text/javascript" src="/static/ht/plugins/webUploader/js/webuploader.js?v=1"></script>
+
+<style type="text/css">
+.parentFileBox>.fileBoxUl>li>.viewThumb{
+	width:150px;height:200px;
+}
+.parentFileBox>.fileBoxUl>li{
+	width:150px;height:200px;
+}
+</style>
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">{if $datas[title]}编辑内容{else}添加内容{/if}&nbsp;&nbsp;<a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books/unit_data?book_id={$book_id}&page_id={$page_id}&unit_id={$unit_id}&v={:time()}">返回内容列表</a> </div>
+      <div class="layui-card-body" style="padding: 15px;">
+        <form class="layui-form" action="/ht/books/submit_unit_data" lay-filter="component-form-group" id="form" method="post">
+			<div class="layui-form-item">
+	            {$category['name']}/{$grade['name']}/{$book['title']}/{$unit[unit_num]}/{$unit_page[title]}
+	          </div>
+			<div class="layui-form-item">
+	            <label class="layui-form-label layui-form-label-required">类型</label>
+	            <div class="layui-input-inline w2">
+	              <select name="type"  lay-filter="type" lay-verify="required">
+                	<option value="1" {if $datas[type]==1}selected{/if}>单词</option>
+                	<option value="2" {if $datas[type]==2}selected{/if}>短语</option>
+                	<option value="3" {if $datas[type]==3}selected{/if}>句型</option>
+	              </select>
+	            </div>
+	          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">内容</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="title" lay-verify="required" autocomplete="off" placeholder="请输入内容 如：apple" class="layui-input" value="{$datas[title]}">
+            </div>
+          </div>
+          <div class="layui-form-item yinbiao_audio-item">
+            <label class="layui-form-label layui-form-label-required">音频</label>
+            <div class="layui-input-block w4">
+	              <div id="" class="wu-example">
+				        <div id="thelist1" class="uploader-list w6 fl">
+					    	<input type="text" name="yinbiao_audio" lay-verify="required" autocomplete="off" placeholder="请上传音频文件" class="layui-input w12" value="{$datas[yinbiao_audio]}" id="yinbiao_audio" readonly>
+					    </div>
+				        <div id="picker1" class="fl">选择文件</div>
+				        <div class="state1 state_body"></div>
+					</div>
+            </div>
+          </div>
+          <div class="layui-form-item yinbiao-item"  {if $datas[type]==3 || $datas[type]==2}style="display:none"{/if}>
+            <label class="layui-form-label layui-form-label-required">音标</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="yinbiao" lay-verify="required" autocomplete="off" placeholder="请输入音标" class="layui-input" value="{$datas[yinbiao]}">
+            </div>
+          </div>
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">释义</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="shiyi" lay-verify="required" autocomplete="off" placeholder="请输入释义" class="layui-input" value="{$datas[shiyi]}">
+            </div>
+          </div>
+          
+          <div class="layui-form-item example-item" {if $datas[type]==3}style="display:none"{/if}>
+            <label class="layui-form-label layui-form-label-required">例句</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="example" lay-verify="required" autocomplete="off" placeholder="请输入例句" class="layui-input" value="{$datas[example]}">
+            </div>
+          </div>
+          <div class="layui-form-item example_audio-item"  {if $datas[type]==3}style="display:none"{/if}>
+            <label class="layui-form-label layui-form-label-required">音频</label>
+            <div class="layui-input-block w4">
+	              <div id="" class="wu-example">
+				        <div id="thelist2" class="uploader-list w6 fl">
+					    	<input type="text" name="example_audio" lay-verify="required" autocomplete="off" placeholder="请上传音频文件" class="layui-input w12" value="{$datas[example_audio]}" id="example_audio" readonly>
+					    </div>
+				        <div id="picker2" class="fl">选择文件</div>
+				        <div class="state2 state_body"></div>
+					</div>
+            </div>
+          </div>
+          <div class="layui-form-item translate-item"  {if $datas[type]==3}style="display:none"{/if}>
+            <label class="layui-form-label layui-form-label-required">翻译</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="translate" lay-verify="required" autocomplete="off" placeholder="请输入翻译" class="layui-input" value="{$datas[translate]}">
+            </div>
+          </div>
+    
+          
+          
+          <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+            	<div class="layui-footer" style="left:0px">
+            		<input type="hidden" name="datas_id" value="{$datas[id]}"/>
+            		<input type="hidden" name="page_id" value="{$page_id}"/>
+            		<input type="hidden" name="book_id" value="{$book_id}"/>
+            		<input type="hidden" name="unit_id" value="{$unit_id}"/>
+	                <button class="layui-btn" lay-submit="" lay-filter="form-submit">立即提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script>
+  layui.use(['form'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,form = layui.form;
+    
+    form.render(null, 'component-form-group');
+	
+    /* 自定义验证规则 */
+    form.verify({
+      title: function(value){
+        if(value.length < 5){
+          return '标题至少得5个字符啊';
+        }
+      }
+      ,pass: [/(.+){6,12}$/, '密码必须6到12位']
+      ,content: function(value){
+        layedit.sync(editIndex);
+      }
+    });
+    
+    form.on('select(type)', function(data){
+		if(data.value==1){
+			//单词
+			$('.yinbiao_audio-item').show();
+			$('.example-item').show();
+			$('.example_audio-item').show();
+			$('.translate-item').show();
+			$('.yinbiao-item').show();
+		}else if(data.value==2){
+			//短语
+			$('.example-item').show();
+			$('.example_audio-item').show();
+			$('.translate-item').show();
+			$('.yinbiao_audio-item').show();
+			$('.yinbiao-item').hide();
+		}else if(data.value==3){
+			//句型
+			$('.yinbiao_audio-item').show();
+			$('.example-item').hide();
+			$('.example_audio-item').hide();
+			$('.translate-item').hide();
+			$('.yinbiao-item').hide();
+		}
+	});
+	
+    /* 监听提交 */
+    form.on('submit(form-submit)', function(data){
+    	 $('form').ajaxSubmit({ 
+            type: 'post',
+            url: '{:url("books/submit_unit_data")}',
+            data: data.field, 
+            dataType:'json',
+            success: function(res) {
+				if(res.code==100){
+	    			layer.msg('操作成功', {
+			            offset: '15px'
+			            ,icon: 1
+			            ,time: 500
+			          }, function(){
+			            location.href = '/ht/books/unit_data?book_id={$book_id}&page_id={$page_id}&unit_id={$unit_id}&v={:time()}'; 
+			          });
+	    		}else{
+	    			dialog.error(res.msg);
+	    		}
+            }
+        }); 
+        return false;
+    });
+	
+
+	
+	
+  });
+</script>
+<script type="text/javascript">
+	initWebuploader1();
+	
+  	function initWebuploader1(){
+  		var $list1 = $('#thelist1'),
+        state1 = 'pending';
+        
+	    uploader1 = WebUploader.create({
+	    	auto: true, // 选完文件后，是否自动上传 
+	        // 不压缩image
+	        resize: false,
+	        // swf文件路径
+	        swf: '/static/ht/plugins/webUploader/js/Uploader.swf',
+	        // 文件接收服务端。
+	        server: '/ht/pkg/upload',
+	        // 选择文件的按钮。可选。
+	        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+	        pick: '#picker1',
+	        duplicate:true,//是否允许重复上传
+	        accept: {
+		    	
+		    },
+		    fileNumLimit: 1, //限制上传个数
+		    fileSingleSizeLimit: 204800000 //限制单个上传图片的大小
+	    });
+	    // 当有文件添加进来的时候
+	    uploader1.on( 'fileQueued', function( file ) {
+	        $('.state1').html( '<div id="' + file.id + '" class="item">' +
+	            //'<h4 class="info">' + file.name + '</h4>' +
+	            '<p class="state1">等待上传...</p>' +
+	        '</div>' );
+	    });
+	    // 文件上传过程中创建进度条实时显示。
+	    uploader1.on( 'uploadProgress', function( file, percentage ) {
+	        var $li = $( '#'+file.id ),
+	            $percent = $li.find('.progress .progress-bar');
+	        // 避免重复创建
+	        if ( !$percent.length ) {
+	            $percent = $('<div class="progress progress-striped active">' +
+	              '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+	              '</div>' +
+	            '</div>').appendTo( $li ).find('.progress-bar');
+	        }
+	        $li.find('p.state1').text('上传中');
+	        $percent.css( 'width', percentage * 100 + '%' );
+	    });
+	    uploader1.on( 'uploadSuccess', function( file, response ) {
+	    	$('input[name="yinbiao_audio"]').val(response.msg);
+	        $( '#'+file.id ).find('p.state1').text('');
+	        uploader1.removeFile(file, true);
+	    });
+	    uploader1.on( 'uploadError', function( file ) {
+	        $( '#'+file.id ).find('p.state1').text('上传出错');
+	    });
+	    uploader1.on( 'uploadComplete', function( file ) {
+	        $( '#'+file.id ).find('.progress').fadeOut();
+	    });
+	    uploader1.on( 'all', function( type ) {
+	        if ( type === 'startUpload' ) {
+	            state1 = 'uploading';
+	        } else if ( type === 'stopUpload' ) {
+	            state1 = 'paused';
+	        } else if ( type === 'uploadFinished' ) {
+	            state1 = 'done';
+	        }
+	    });
+	    uploader1.on("uploadFinished", function () {
+	        uploader1.destroy();
+	        initWebuploader1();
+	    });
+  	}
+  	
+  	
+  	initWebuploader2();
+	
+  	function initWebuploader2(){
+  		var $list2 = $('#thelist2'),
+        state2 = 'pending';
+        
+	    uploader2 = WebUploader.create({
+	    	auto: true, // 选完文件后，是否自动上传 
+	        // 不压缩image
+	        resize: false,
+	        // swf文件路径
+	        swf: '/static/ht/plugins/webUploader/js/Uploader.swf',
+	        // 文件接收服务端。
+	        server: '/ht/pkg/upload',
+	        // 选择文件的按钮。可选。
+	        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+	        pick: '#picker2',
+	        duplicate:true,//是否允许重复上传
+	        accept: {
+		    
+		    },
+		    fileNumLimit: 1, //限制上传个数
+		    fileSingleSizeLimit: 204800000 //限制单个上传图片的大小
+	    });
+	    // 当有文件添加进来的时候
+	    uploader2.on( 'fileQueued', function( file ) {
+	        $('.state2').html( '<div id="' + file.id + '" class="item">' +
+	            //'<h4 class="info">' + file.name + '</h4>' +
+	            '<p class="state2">等待上传...</p>' +
+	        '</div>' );
+	    });
+	    // 文件上传过程中创建进度条实时显示。
+	    uploader2.on( 'uploadProgress', function( file, percentage ) {
+	        var $li = $( '#'+file.id ),
+	            $percent = $li.find('.progress .progress-bar');
+	        // 避免重复创建
+	        if ( !$percent.length ) {
+	            $percent = $('<div class="progress progress-striped active">' +
+	              '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+	              '</div>' +
+	            '</div>').appendTo( $li ).find('.progress-bar');
+	        }
+	        $li.find('p.state2').text('上传中');
+	        $percent.css( 'width', percentage * 100 + '%' );
+	    });
+	    uploader2.on( 'uploadSuccess', function( file, response ) {
+	    	$('input[name="example_audio"]').val(response.msg);
+	        $( '#'+file.id ).find('p.state2').text('');
+	        uploader2.removeFile(file, true);
+	    });
+	    uploader2.on( 'uploadError', function( file ) {
+	        $( '#'+file.id ).find('p.state2').text('上传出错');
+	    });
+	    uploader2.on( 'uploadComplete', function( file ) {
+	        $( '#'+file.id ).find('.progress').fadeOut();
+	    });
+	    uploader2.on( 'all', function( type ) {
+	        if ( type === 'startUpload' ) {
+	            state2 = 'uploading';
+	        } else if ( type === 'stopUpload' ) {
+	            state2 = 'paused';
+	        } else if ( type === 'uploadFinished' ) {
+	            state2 = 'done';
+	        }
+	    });
+	    uploader2.on("uploadFinished", function () {
+	        uploader2.destroy();
+	        initWebuploader2();
+	    });
+  	}
+  	
+</script>
+
+{include file='common/footer'}

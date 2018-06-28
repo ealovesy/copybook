@@ -1,0 +1,248 @@
+{include file='common/header'}
+<script type="text/javascript" src="/static/ht/js/jquery/jquery.form.js"></script>
+<!--上传组件-->
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/webuploader.css?v1" />
+<link rel="stylesheet" type="text/css" href="/static/ht/plugins/webUploader/css/bootstrap.min.css" />
+<script type="text/javascript" src="/static/ht/plugins/webUploader/js/webuploader.js?v=3"></script>
+
+  <div class="layui-fluid">
+    <div class="layui-card">
+      <div class="layui-card-header">{if $unit_exam[title]}编辑题目{else}创建题目{/if}&nbsp;&nbsp;<a class="layui-btn layui-btn-primary layui-btn-xs" href="/ht/books/unit_exam?unit_id={$unit_id}&book_id={$book_id}&v={:time()}">返回列表</a> </div>
+      <div class="layui-card-body" style="padding: 15px;">
+        <form class="layui-form" action="/ht/books/submit_unit_exam" lay-filter="component-form-group" id="form" method="post">
+        	
+        	<div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">题目类型</label>
+            <div class="layui-input-block w2">
+            	<select name="type" id="type" lay-verify="required" class="layui-input" lay-filter="type">
+            		<option value="1" {if $unit_exam[type]==1}selected{/if}>汉译英</option>
+            		<option value="2" {if $unit_exam[type]==2}selected{/if}>英译汉</option>
+            		<option value="3" {if $unit_exam[type]==3}selected{/if}>听音选择</option>
+            	</select>
+            </div>
+          </div>
+        	
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">题目名称</label>
+            <div class="layui-input-block w4">
+              <input type="text" name="name" lay-verify="required" autocomplete="off" placeholder="请输入题目名称" class="layui-input" value="{$unit_exam[name]}">
+            </div>
+          </div>
+          <div class="layui-form-item yinbiao_audio-item" style="{if $unit_exam[audio_url]}display:block{else}display:none{/if}" id="audio_upload">
+            <label class="layui-form-label layui-form-label-required">音频</label>
+            <div class="layui-input-block w4">
+	              <div id="" class="wu-example">
+				        <div id="thelist" class="uploader-list w6 fl">
+					    	<input type="text" name="audio_url"  autocomplete="off" placeholder="请上传音频文件" class="layui-input w12" value="{$unit_exam[audio_url]}" id="yinbiao_audio" readonly>
+					    </div>
+				        <div id="picker" class="fl">选择文件</div>
+				        <div class="state state_body"></div>
+					</div>
+            </div>
+          </div>
+          
+          <div class="layui-form-item">
+            <label class="layui-form-label layui-form-label-required">答案选项</label>
+            {if !$unit_exam_answer}
+	            <div class="layui-input-block w4 layui-form-item" style="display:flex;clear:none">
+	              <input type="text" name="answer[1]" lay-verify="required" autocomplete="off" placeholder="请输入答案选项名称" class="layui-input" value="">
+	              &nbsp;&nbsp;<input type="checkbox" name="answer_true[1]" title="是答案" class="layui-btn-sm ">
+	         	   <button class="layui-btn " type="button" style="margin-top: 4px;height:30px;line-height:30px;" id="new_answer">新增</button>
+	            </div>
+            {/if}
+            <div class="answer_list">
+            	{if $unit_exam_answer}
+            		{foreach $unit_exam_answer as $key=>$answer}
+            			<div class="layui-input-block w4 layui-form-item" style="display:flex;clear:none">
+			              <input type="text" name="answer[{$key}]" lay-verify="required" autocomplete="off" placeholder="请输入答案选项名称" class="layui-input" value="{$answer[name]}">
+			              &nbsp;&nbsp;<input type="checkbox" name="answer_true[{$key}]" title="是答案" class="layui-btn-sm" {if in_array($answer[id], $answer_ids)}checked{/if}>
+			         	   <button class="layui-btn layui-btn-danger del_answer" type="button" style="margin-top: 4px;height:30px;line-height:30px;">删除</button>
+			            </div>
+            		{/foreach}
+            	{/if}
+            </div>
+            {if $unit_exam_answer}
+            	<div class="layui-input-block w4">
+        			<button class="layui-btn " type="button" style="margin-top: 4px;height:30px;line-height:30px;" id="new_answer">新增</button>
+        		</div>
+            {/if}
+          </div>
+		
+          
+          <div class="layui-form-item layui-layout-admin">
+            <div class="layui-input-block">
+            	<div class="layui-footer" style="left:0px">
+            		<input type="hidden" name="unit_exam_id" value="{$unit_exam[id]}"/>
+            		<input type="hidden" name="unit_id" value="{$unit_id}"/>
+	                <button class="layui-btn" lay-submit="" lay-filter="form-submit">立即提交</button>
+	                <button type="reset" class="layui-btn layui-btn-primary">重置</button>
+                </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+
+
+<script src="/static/ht/layuiadmin/layui/layui.js"></script>
+<script>
+  layui.use(['form','upload'], function(){
+    var $ = layui.$
+    ,admin = layui.admin
+    ,element = layui.element
+    ,layer = layui.layer
+    ,upload = layui.upload
+    ,form = layui.form;
+    
+    form.render(null, 'component-form-group');
+	
+
+    /* 监听提交 */
+    form.on('submit(form-submit)', function(data){
+    	 $('form').ajaxSubmit({ 
+            type: 'post',
+            url: '{:url("books/submit_unit_exam")}',
+            data: data.field, 
+            dataType:'json',
+            success: function(res) {
+				if(res.code==100){
+	    			layer.msg('操作成功', {
+			            offset: '15px'
+			            ,icon: 1
+			            ,time: 500
+			          }, function(){
+			            location.href = '/ht/books/unit_exam?unit_id={$unit_id}&book_id={$book_id}&v={:time()}'; 
+			          });
+	    		}else{
+	    			dialog.error(res.msg);
+	    		}
+            }
+        }); 
+        return false;
+    });
+	
+	//多图片上传
+    upload.render({
+      elem: '#test-upload-more'
+      ,url: '/ht/pkg/upload'
+      ,multiple: true
+      ,before: function(obj){
+        //预读本地文件示例，不支持ie8
+        obj.preview(function(index, file, result){
+          $('#upload-more-list').append('<img src="'+ result +'" alt="'+ file.name +'" class="layui-upload-img">')
+        });
+      }
+      ,done: function(res){
+        //上传完毕
+        var html = '<input type="hidden" name="banner[]" value="'+res.msg+'">';
+          $('#upload-more-list').append(html);
+      }
+    });
+	
+	del_answer();
+	
+	$("#new_answer").click(function(){
+		var _id = (new Date()).valueOf();
+		var answer = '<div class="layui-input-block w4 layui-form-item" style="display:flex">'+
+              '<input type="text" name="answer['+_id+']" lay-verify="required" autocomplete="off" placeholder="请输入答案选项名称" class="layui-input" '+
+              'value="">'+
+              '&nbsp;&nbsp;<input type="checkbox" name="answer_true['+_id+']" title="是答案" class="layui-btn-sm ">'+
+         	   '<button class="layui-btn layui-btn-danger del_answer" type="button" style="margin-top: 4px;height:30px;line-height:30px;">删除</button>'+
+            '</div>';
+		$('.answer_list').append(answer);
+		form.render('checkbox');
+		del_answer();
+	})
+	
+	function del_answer(){
+		$('.del_answer').unbind('click');
+		$('.del_answer').click(function(){
+			$(this).parent().remove();
+		});
+	}
+	
+	form.on('select(type)', function(data){
+	  if(data.value == 3){
+	  	$("#audio_upload").show();
+	  }else{
+	  	$("#audio_upload").hide();
+	  }
+	});
+	
+	//上传音频
+	initWebuploader();
+	
+  	function initWebuploader(){
+  		var $list = $('#thelist'),
+        state = 'pending';
+        
+	    uploader = WebUploader.create({
+	    	auto: true, // 选完文件后，是否自动上传 
+	        // 不压缩image
+	        resize: false,
+	        // swf文件路径
+	        swf: '/static/ht/plugins/webUploader/js/Uploader.swf',
+	        // 文件接收服务端。
+	        server: '/ht/pkg/upload',
+	        // 选择文件的按钮。可选。
+	        // 内部根据当前运行是创建，可能是input元素，也可能是flash.
+	        pick: '#picker',
+	        duplicate:true,//是否允许重复上传
+	        accept: {
+		    	
+		    },
+		    fileNumLimit: 1, //限制上传个数
+		    fileSingleSizeLimit: 204800000 //限制单个上传图片的大小
+	    });
+	    // 当有文件添加进来的时候
+	    uploader.on( 'fileQueued', function( file ) {
+	        $('.state').html( '<div id="' + file.id + '" class="item">' +
+	            //'<h4 class="info">' + file.name + '</h4>' +
+	            '<p class="state">等待上传...</p>' +
+	        '</div>' );
+	    });
+	    // 文件上传过程中创建进度条实时显示。
+	    uploader.on( 'uploadProgress', function( file, percentage ) {
+	        var $li = $( '#'+file.id ),
+	            $percent = $li.find('.progress .progress-bar');
+	        // 避免重复创建
+	        if ( !$percent.length ) {
+	            $percent = $('<div class="progress progress-striped active">' +
+	              '<div class="progress-bar" role="progressbar" style="width: 0%">' +
+	              '</div>' +
+	            '</div>').appendTo( $li ).find('.progress-bar');
+	        }
+	        $li.find('p.state').text('上传中');
+	        $percent.css( 'width', percentage * 100 + '%' );
+	    });
+	    uploader.on( 'uploadSuccess', function( file, response ) {
+	    	$('input[name="audio_url"]').val(response.msg);
+	        $( '#'+file.id ).find('p.state').text('');
+	        uploader.removeFile(file, true);
+	    });
+	    uploader.on( 'uploadError', function( file ) {
+	        $( '#'+file.id ).find('p.state').text('上传出错');
+	    });
+	    uploader.on( 'uploadComplete', function( file ) {
+	        $( '#'+file.id ).find('.progress').fadeOut();
+	    });
+	    uploader.on( 'all', function( type ) {
+	        if ( type === 'startUpload' ) {
+	            state = 'uploading';
+	        } else if ( type === 'stopUpload' ) {
+	            state = 'paused';
+	        } else if ( type === 'uploadFinished' ) {
+	            state = 'done';
+	        }
+	    });
+	    uploader.on("uploadFinished", function () {
+	        uploader.destroy();
+	        initWebuploader();
+	    });
+  	}
+  });
+</script>
+  
+{include file='common/footer'}
